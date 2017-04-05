@@ -1,6 +1,6 @@
-package cn.bistu.icdd.gpf;
+package cn.bistu.icdd.gpf.paragraph;
 
-public class FirstParagraphGenerator implements ParagraphGenerator {
+public class LastParagraphGenerator implements ParagraphGenerator {
 
 	@Override
 	public String generator() {

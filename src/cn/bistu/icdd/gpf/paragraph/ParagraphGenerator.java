@@ -1,4 +1,4 @@
-package cn.bistu.icdd.gpf;
+package cn.bistu.icdd.gpf.paragraph;
 
 public interface ParagraphGenerator {
 	public String generator();
