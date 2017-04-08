@@ -68,6 +68,7 @@ public class GameData {
 	// 控球率
 	private double homeControl;
 	private double awayControl;
+	
 	public int getHomeSumShoot() {
 		return homeSumShoot;
 	}
@@ -273,5 +274,24 @@ public class GameData {
 		this.awayControl = awayControl;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "总射门数" + homeSumShoot + "：" + awaySumShoot + "\n"
+				+ "射正球门" + homeShootOnTarget + "：" + awayShootOnTarget + "\n" 
+				+ "射门偏出" + homeOutTarget + "：" + awayOutTarget + "\n" 
+				+ "击中门框" + homeShootDoor + "：" + awayShootDoor + "\n" 
+				+ "直塞球" + homeThroughPass + "：" + awayThroughPass + "\n" 
+				+ "越位" + homeOffset + "：" + awayOffset + "\n" 
+				+ "抢断" + homeSteal + "：" + awaySteal + "\n" 
+				+ "任意球" + homeFreeKick + "：" + awayFreeKick + "\n" 
+				+ "犯规" + homeFoul + "：" + awayFoul + "\n" 
+				+ "角球" + homeCornerkick + "：" + awayCornerKick + "\n" 
+				+ "界外球" + homeOutOfBound + "：" + awayOutOfBound + "\n" 
+				+ "超过25码长传" + homeExceed25 + "：" + awayExceed25 + "\n" 
+				+ "传球成功率" + homeSuccessPass + "：" + awaySuccessPass + "\n" 
+				+ "传中成功率" + homeSuccessCross + "：" + awaySuccessCross + "\n" 
+				+ "抢断成功率" + homeSuccessSteal + "：" + awaySuccessSteal + "\n"
+				+ "头球成功率" + homeSuccessHead + "：" + awaySuccessHead + "\n" 
+				+ "控球率" + homeControl + "：" + awayControl ; 
+	}
 }

@@ -1,5 +1,11 @@
 package cn.bistu.icdd.gpf.passage;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +30,7 @@ import cn.bistu.icdd.gpf.entity.Player;
  *
  */
 public class PassageGenerator {
-	// 存文本用
+	// 存直播文本用
 	List<LiveTerm> live = new ArrayList<LiveTerm>();
 	
 	// 存主队用
@@ -35,12 +41,253 @@ public class PassageGenerator {
 	
 	// 存数据用
 	GameData data = new GameData();
+	
+	static int halfTime ; // 记录上半场结束时间
+	
+	/**
+	 * 构造函数
+	 * @param path 新闻文本路径
+	 */
+	public PassageGenerator(String path){
+		init(path);
+	}
 
 	/**
 	 * 将文本读出初始化信息
 	 */
-	private void inti() {
+	private void init(String rootPath) {
+		initLive(rootPath+"/"+"live.csv");
+		initTeam(rootPath+"/"+"home.csv", home); // 主队
+		initTeam(rootPath+"/"+"away.csv", away); // 客队
+		initData(rootPath+"/"+"tec.csv");
 		
+		//System.out.println(live);
+		//System.out.println(home);
+		//System.out.println(away);
+		System.out.println(data);
+	}
+	
+	/**
+	 * 初始化直播文本
+	 */
+	private void initLive(String path){
+		BufferedReader br = null;
+		
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(path),"utf-8"));
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				String[] strs = line.split(",");
+				
+				LiveTerm lt = new LiveTerm();
+				// 文本
+				lt.setLine(strs[0]);
+				
+				// 时间
+				int time;
+				switch (strs[1]) {
+				case "未赛":
+					lt.setTime(-2);
+					break;
+				case "中场":
+					lt.setTime(-1);
+					break;
+				case "完赛":
+					lt.setTime(0);
+					break;
+				default:
+					/*
+					 *  判断上下半场用   halfTime记录上半场时间,同时记录上半场的结束时间
+					 *  上半场 19'
+					 *  下半场 9'
+					 */
+					if (strs[1].contains("上半场")) {
+						// System.out.println(strs[1].substring(4, strs[1].indexOf("'")));
+						halfTime = Integer.parseInt(strs[1].substring(4, strs[1].indexOf("'")));
+						lt.setTime(halfTime);
+					} else if (strs[1].contains("下半场")) {
+						int secondHalfTime = halfTime + Integer.parseInt(strs[1].substring(4, strs[1].indexOf("'")));
+						lt.setTime(secondHalfTime);
+					}
+				
+				}
+				
+				// 比分
+				String[] scoreStr = strs[2].split("-");
+				int[] score = {Integer.parseInt(scoreStr[0]),Integer.parseInt(scoreStr[1])};
+				lt.setScore(score);
+				
+				live.add(lt);
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			System.out.println("未找到文件，加载直播文本失败");
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 初始化队伍信息
+	 */
+	private void initTeam(String path, List<Player> team){
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(path),"utf-8"));
+			String line = null;
+			boolean flag = true; // 是否是第一行
+			// 丢弃第一行（表头）
+			while ((line = br.readLine()) != null) {
+				if (flag) {
+					flag = false;
+				} else {
+					Player player = new Player();
+					String[] strs = line.split(",");
+					// 初始化球员信息
+					player.setNumber(Integer.parseInt(strs[0]));
+					player.setPosi(strs[1]);
+					player.setName(strs[2]);
+					if ("首发".equals(strs[3])) {
+						player.setMain(true);
+					} else if ("替补".equals(strs[3])) {
+						player.setMain(false);
+					}
+					player.setTime(Integer.parseInt(strs[4].substring(0, strs[4].indexOf("’"))));
+					player.setGoal(Integer.parseInt(strs[5]));
+					player.setAssist(Integer.parseInt(strs[6]));
+					player.setThreatBall(Integer.parseInt(strs[7]));
+					player.setShoot(Integer.parseInt(strs[8]));
+					player.setShootOnTarget(Integer.parseInt(strs[9]));
+					String str = strs[10];
+					if (str.contains("%")) {
+						player.setTargetRate(Double.parseDouble(str.substring(0, str.length()-1)));
+					} else {
+						player.setTargetRate(0);
+					}
+					player.setFoul(Integer.parseInt(strs[11]));
+					player.setBeFouled(Integer.parseInt(strs[12]));
+					player.setSave(Integer.parseInt(strs[13]));
+					
+					team.add(player);
+				}
+				
+				
+			}
+			
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			System.out.println("未找到文件，加载队伍信息失败");
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 初始化比赛数据
+	 */
+	private void initData(String path){
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(path),"utf-8"));
+			String line = null;
+			while ((line  = br.readLine()) != null) {
+				
+				String[] strs = line.split(",");
+				// 导入比赛数据
+				switch (strs[1]) {
+				case "总射门":
+					data.setHomeSumShoot(Integer.parseInt(strs[0]));
+					data.setAwaySumShoot(Integer.parseInt(strs[2]));
+					break;
+				case "射正球门":
+					data.setHomeShootOnTarget(Integer.parseInt(strs[0]));
+					data.setAwayShootOnTarget(Integer.parseInt(strs[2]));
+					break;
+				case "射门偏出":
+					data.setHomeOutTarget(Integer.parseInt(strs[0]));
+					data.setAwayOutTarget(Integer.parseInt(strs[2]));
+					break;
+				case "击中门框":
+					data.setHomeShootDoor(Integer.parseInt(strs[0]));
+					data.setAwayShootDoor(Integer.parseInt(strs[2]));
+					break;
+				case "直塞球":
+					data.setHomeThroughPass(Integer.parseInt(strs[0]));
+					data.setAwayThroughPass(Integer.parseInt(strs[2]));
+					break;
+				case "越位":
+					data.setHomeOffset(Integer.parseInt(strs[0]));
+					data.setAwayOffset(Integer.parseInt(strs[2]));
+					break;
+				case "抢断":
+					data.setHomeSteal(Integer.parseInt(strs[0]));
+					data.setAwaySteal(Integer.parseInt(strs[2]));
+					break;
+				case "任意球":
+					data.setHomeFreeKick(Integer.parseInt(strs[0]));
+					data.setAwayFreeKick(Integer.parseInt(strs[2]));
+					break;
+				case "犯规":
+					data.setHomeFoul(Integer.parseInt(strs[0]));
+					data.setAwayFoul(Integer.parseInt(strs[2]));
+					break;
+				case "角球":
+					data.setHomeCornerkick(Integer.parseInt(strs[0]));
+					data.setAwayCornerKick(Integer.parseInt(strs[2]));
+					break;
+				case "界外球":
+					data.setHomeOutOfBound(Integer.parseInt(strs[0]));
+					data.setAwayOutOfBound(Integer.parseInt(strs[2]));
+					break;
+				case "超过25码长传":
+					data.setHomeExceed25(Integer.parseInt(strs[0]));
+					data.setAwayExceed25(Integer.parseInt(strs[2]));
+					break;
+				case "传球成功率":
+					data.setHomeSuccessPass(Double.parseDouble(strs[0].substring(0, strs[0].indexOf("%"))));
+					data.setAwaySuccessPass(Double.parseDouble(strs[2].substring(0, strs[2].indexOf("%"))));
+					break;
+				case "传中成功率":
+					data.setHomeSuccessCross(Double.parseDouble(strs[0].substring(0, strs[0].indexOf("%"))));
+					data.setAwaySuccessCross(Double.parseDouble(strs[2].substring(0, strs[2].indexOf("%"))));
+					break;
+				case "抢断成功率":
+					data.setHomeSuccessSteal(Double.parseDouble(strs[0].substring(0, strs[0].indexOf("%"))));
+					data.setAwaySuccessSteal(Double.parseDouble(strs[2].substring(0, strs[2].indexOf("%"))));
+					break;
+				case "头球成功率":
+					data.setHomeSuccessHead(Double.parseDouble(strs[0].substring(0, strs[0].indexOf("%"))));
+					data.setAwaySuccessHead(Double.parseDouble(strs[2].substring(0, strs[2].indexOf("%"))));
+					break;
+				case "控球率":
+					data.setHomeControl(Double.parseDouble(strs[0].substring(0, strs[0].indexOf("%"))));
+					data.setAwayControl(Double.parseDouble(strs[2].substring(0, strs[2].indexOf("%"))));
+					break;
+				default:
+					// 丢弃第一行（表头）
+					break;
+				}
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			System.out.println("未找到文件，加载比赛数据失败");
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

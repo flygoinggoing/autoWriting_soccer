@@ -1,6 +1,7 @@
 package cn.bistu.icdd.gpf.entity;
 
 public class Player {
+	/*
 	enum Position{
 		GOALKEEPER("门将"),BACK("后卫"),MIDFIELD("中场"),FORWARD("前锋"),STRIKER("中锋"),BENCH("替补");
 		
@@ -14,6 +15,8 @@ public class Player {
 			return name;
 		}
 	}
+	*/
+	
 	// 主客场标志（暂时先不用）
 	String team;
 	
@@ -21,16 +24,16 @@ public class Player {
 	int number;
 	
 	// 位置
-	Position posi;
+	String posi;
 	
 	// 球员名
 	String name;
 	
-	// 出场是否替补
+	// 出场是否首发
 	boolean isMain;
 	
 	// 时间
-	Double time;
+	int time;
 	
 	// 进球
 	int goal;
@@ -67,11 +70,11 @@ public class Player {
 		this.number = number;
 	}
 
-	public Position getPosi() {
+	public String getPosi() {
 		return posi;
 	}
 
-	public void setPosi(Position posi) {
+	public void setPosi(String posi) {
 		this.posi = posi;
 	}
 
@@ -91,11 +94,11 @@ public class Player {
 		this.isMain = isMain;
 	}
 
-	public Double getTime() {
+	public int getTime() {
 		return time;
 	}
 
-	public void setTime(Double time) {
+	public void setTime(int time) {
 		this.time = time;
 	}
 
@@ -171,6 +174,9 @@ public class Player {
 		this.save = save;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return number + " " + posi + " " + name + " " + isMain + " " + time + " " + goal + " " + assist + " " + threatBall + " " + shoot + " " + shootOnTarget + " " + targetRate + " " + foul + " " + beFouled + " " + save + "\n"; 
+	}
 	
 }
