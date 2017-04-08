@@ -102,21 +102,21 @@ public class PassageGenerator {
 		String  paragraph;
 		try {
 			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(printPath,true), "utf-8"));
-			// 资源分发
+			/********资源分发**********/
 			// 生成第一段
-			FirstParagraphGenerator fpg = new FirstParagraphGenerator();
+			FirstParagraphGenerator fpg = new FirstParagraphGenerator(live);
 			paragraph = fpg.generator();
 			bw.write(paragraph);
 			bw.newLine();
 			
 			// 生成第二段
-			SecondParagraphGenerator spg = new SecondParagraphGenerator();
+			SecondParagraphGenerator spg = new SecondParagraphGenerator(live);
 			paragraph = spg.generator();
 			bw.write(paragraph);
 			bw.newLine();
 			
 			// 生成第三段
-			ThirdParagraphGenerator tpg = new ThirdParagraphGenerator();
+			ThirdParagraphGenerator tpg = new ThirdParagraphGenerator(live);
 			paragraph = tpg.generator();
 			bw.write(paragraph);
 			bw.newLine();

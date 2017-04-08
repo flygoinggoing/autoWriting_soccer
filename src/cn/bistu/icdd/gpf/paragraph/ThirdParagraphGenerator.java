@@ -1,5 +1,9 @@
 package cn.bistu.icdd.gpf.paragraph;
 
+import java.util.List;
+
+import cn.bistu.icdd.gpf.entity.LiveTerm;
+
 /**
  * 比赛过程生成类
  * 
@@ -8,7 +12,7 @@ package cn.bistu.icdd.gpf.paragraph;
  */
 public class ThirdParagraphGenerator implements ParagraphGenerator {
 
-	public ThirdParagraphGenerator() {
+	public ThirdParagraphGenerator(List<LiveTerm> live) {
 		// TODO Auto-generated constructor stub
 	}
 	
