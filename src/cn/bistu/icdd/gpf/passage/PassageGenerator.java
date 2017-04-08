@@ -1,10 +1,14 @@
 package cn.bistu.icdd.gpf.passage;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +16,10 @@ import java.util.List;
 import cn.bistu.icdd.gpf.entity.GameData;
 import cn.bistu.icdd.gpf.entity.LiveTerm;
 import cn.bistu.icdd.gpf.entity.Player;
+import cn.bistu.icdd.gpf.paragraph.FirstParagraphGenerator;
+import cn.bistu.icdd.gpf.paragraph.LastParagraphGenerator;
+import cn.bistu.icdd.gpf.paragraph.SecondParagraphGenerator;
+import cn.bistu.icdd.gpf.paragraph.ThirdParagraphGenerator;
 
 /**
  * 文章生成类
@@ -44,12 +52,31 @@ public class PassageGenerator {
 	
 	static int halfTime ; // 记录上半场结束时间
 	
+	String printPath;  // 文本生成路径
+	
 	/**
 	 * 构造函数
 	 * @param path 新闻文本路径
+	 * @param printPath 结果输出路径
 	 */
-	public PassageGenerator(String path){
+	public PassageGenerator(String path, String printPath){
 		init(path);
+		this.printPath = printPath;
+		
+		// 创建输出文件
+		File printFile = new File(printPath); 
+		if (!printFile.exists()) {
+			File parent = printFile.getParentFile();
+			if (!parent.exists()) {
+				parent.mkdirs();
+			}
+			try {
+				printFile.createNewFile();
+			} catch (IOException e) {
+				System.out.println("创建文件失败");
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -64,7 +91,59 @@ public class PassageGenerator {
 		//System.out.println(live);
 		//System.out.println(home);
 		//System.out.println(away);
-		System.out.println(data);
+		//System.out.println(data);
+	}
+	
+	/**
+	 * 文章生成的主函数
+	 */
+	public void autoWriting(){
+		BufferedWriter bw = null;
+		String  paragraph;
+		try {
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(printPath,true), "utf-8"));
+			// 资源分发
+			// 生成第一段
+			FirstParagraphGenerator fpg = new FirstParagraphGenerator();
+			paragraph = fpg.generator();
+			bw.write(paragraph);
+			bw.newLine();
+			
+			// 生成第二段
+			SecondParagraphGenerator spg = new SecondParagraphGenerator();
+			paragraph = spg.generator();
+			bw.write(paragraph);
+			bw.newLine();
+			
+			// 生成第三段
+			ThirdParagraphGenerator tpg = new ThirdParagraphGenerator();
+			paragraph = tpg.generator();
+			bw.write(paragraph);
+			bw.newLine();
+			
+			// 生成第四段
+			LastParagraphGenerator lpg = new LastParagraphGenerator(home, away);
+			paragraph = lpg.generator();
+			bw.write(paragraph);
+			bw.newLine();
+			
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			System.out.println("未找到写出文件");
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (bw != null) {
+				try {
+					bw.close();
+					bw = null;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	/**
@@ -84,7 +163,6 @@ public class PassageGenerator {
 				lt.setLine(strs[0]);
 				
 				// 时间
-				int time;
 				switch (strs[1]) {
 				case "未赛":
 					lt.setTime(-2);
@@ -130,6 +208,7 @@ public class PassageGenerator {
 			if (br != null) {
 				try {
 					br.close();
+					br = null;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -191,6 +270,15 @@ public class PassageGenerator {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+					br = null;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	
@@ -287,6 +375,15 @@ public class PassageGenerator {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+					br = null;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	

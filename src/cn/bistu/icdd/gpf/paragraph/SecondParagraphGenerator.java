@@ -8,6 +8,9 @@ package cn.bistu.icdd.gpf.paragraph;
  */
 public class SecondParagraphGenerator implements ParagraphGenerator {
 
+	public SecondParagraphGenerator() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	@Override
 	public String generator() {
