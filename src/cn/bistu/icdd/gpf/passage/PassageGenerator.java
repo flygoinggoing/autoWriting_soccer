@@ -103,6 +103,7 @@ public class PassageGenerator {
 		try {
 			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(printPath,true), "utf-8"));
 			/********资源分发**********/
+			// 考虑是否需要将文本分解为不同的list，只传需要的部分
 			// 生成第一段
 			FirstParagraphGenerator fpg = new FirstParagraphGenerator(live);
 			paragraph = fpg.generator();
