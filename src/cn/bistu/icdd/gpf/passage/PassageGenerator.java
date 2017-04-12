@@ -105,19 +105,40 @@ public class PassageGenerator {
 			/********资源分发**********/
 			// 考虑是否需要将文本分解为不同的list，只传需要的部分
 			// 生成第一段
-			FirstParagraphGenerator fpg = new FirstParagraphGenerator(live);
+			List<LiveTerm> beforeGame = new ArrayList<LiveTerm>();  //未赛
+			List<LiveTerm> middleGame = new ArrayList<LiveTerm>();  //中场
+			List<LiveTerm> bafterGame = new ArrayList<LiveTerm>();  //完赛
+			List<LiveTerm> inGame = new ArrayList<LiveTerm>(); //比赛
+			
+			for (LiveTerm term : live) {
+				switch (term.getTime()) {
+				case -2:
+					beforeGame.add(term);
+					break;
+				case -1:
+					middleGame.add(term);
+					break;
+				case 0:
+					bafterGame.add(term);
+					break;
+				default:
+					inGame.add(term);
+				}
+			}
+			
+			FirstParagraphGenerator fpg = new FirstParagraphGenerator(beforeGame, middleGame, bafterGame);
 			paragraph = fpg.generator();
 			bw.write(paragraph);
 			bw.newLine();
 			
 			// 生成第二段
-			SecondParagraphGenerator spg = new SecondParagraphGenerator(live);
+			SecondParagraphGenerator spg = new SecondParagraphGenerator(beforeGame);
 			paragraph = spg.generator();
 			bw.write(paragraph);
 			bw.newLine();
 			
 			// 生成第三段
-			ThirdParagraphGenerator tpg = new ThirdParagraphGenerator(live);
+			ThirdParagraphGenerator tpg = new ThirdParagraphGenerator(inGame);
 			paragraph = tpg.generator();
 			bw.write(paragraph);
 			bw.newLine();

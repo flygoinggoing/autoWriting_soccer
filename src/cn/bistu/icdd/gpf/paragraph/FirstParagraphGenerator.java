@@ -14,7 +14,7 @@ import cn.bistu.icdd.gpf.entity.LiveTerm;
  */
 public class FirstParagraphGenerator implements ParagraphGenerator {
 
-	public FirstParagraphGenerator(List<LiveTerm> live) {
+	public FirstParagraphGenerator(List<LiveTerm> beforeGame, List<LiveTerm> middleGame, List<LiveTerm> bafterGame) {
 		// TODO Auto-generated constructor stub
 	}
 	
